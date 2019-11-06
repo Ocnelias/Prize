@@ -27,6 +27,10 @@ class UserPrize extends \yii\db\ActiveRecord
     const STATUS_REFUSED= 3;
     const STATUS_CHANGED= 4;
 
+    const ACTION_BANK = 1;
+    const ACTION_BONUS = 2;
+    const ACTION_SEND = 3;
+
 
     /**
      * {@inheritdoc}
@@ -44,6 +48,17 @@ class UserPrize extends \yii\db\ActiveRecord
             self::STATUS_SENT => 'Sent',
             self::STATUS_REFUSED => 'Refused',
             self::STATUS_CHANGED => 'Changed to bonus',
+        ];
+        return $list;
+    }
+
+    public static function readableActions()
+    {
+        $list = [
+            self::ACTION_BANK => 'Send money to bank account',
+            self::ACTION_BONUS => 'Send your prize to bonus account',
+            self::ACTION_SEND => 'Send your prize by post',
+
         ];
         return $list;
     }
@@ -111,6 +126,26 @@ class UserPrize extends \yii\db\ActiveRecord
         }
 
         return $quantity;
+    }
+
+    public static function PrizesActions($type)
+    {
+
+        switch ($type) {
+            case Prize::TYPE_MONEY:
+                $action=self::readableActions()[self::ACTION_BANK];
+                break;
+            case Prize::TYPE_BONUS:
+                $action=self::readableActions()[self::ACTION_BONUS];
+                break;
+            case Prize::TYPE_PRODUCT:
+                $action=self::readableActions()[self::ACTION_SEND];
+                break;
+            default:
+                $action=self::readableActions()[self::ACTION_BANK];
+        }
+
+        return $action;
     }
 
 }
