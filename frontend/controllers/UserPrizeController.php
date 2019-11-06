@@ -31,7 +31,7 @@ class UserPrizeController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['process', 'show-prize-success', 'show-prize-error', 'send-prize', 'refuse-prize'],
+                        'actions' => ['process', 'show-prize-success', 'show-prize-error', 'send-prize', 'refuse-prize', 'convert-user-money'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -116,7 +116,7 @@ class UserPrizeController extends Controller
 
         if (!$user_prize or  $user_prize->user_id != Yii::$app->user->id) {
             Yii::$app->session->setFlash('error', "Your have no prizes yet");
-            return $this->redirect(['/site/index']);
+            return $this->redirect([Yii::$app->homeUrl]);
         }
 
         return $this->render('show-prize-success', [
@@ -127,11 +127,7 @@ class UserPrizeController extends Controller
 
     public function actionShowPrizeError()
     {
-
-        return $this->render('show-prize-error', [
-
-        ]);
-
+        return $this->render('show-prize-error');
     }
 
     /*
@@ -143,7 +139,7 @@ class UserPrizeController extends Controller
         $user_prize=UserPrize::find()->where(['user_id'=>Yii::$app->user->id])->one();
 
         if (!$user_prize or $actionType !=$user_prize->prize->prize_type) {
-            return $this->redirect(['/site/index']);
+            return $this->redirect([Yii::$app->homeUrl]);
         }
 
         switch ($actionType) {
@@ -184,6 +180,32 @@ class UserPrizeController extends Controller
         return $this->render('prize-send', [
 
         ]);
+
+
+    }
+
+    /*
+    * convert money to bonus
+    */
+    public function actionConvertUserMoney()
+    {
+        $user_money=UserPrize::find()->JoinWith('prize')
+            ->where(['user_id'=>Yii::$app->user->id])
+            ->andWhere(['prize_type'=>Prize::TYPE_MONEY])
+            ->andWhere(['status'=>UserPrize::STATUS_RECEIVED])
+            ->one();
+
+        if ($user_money) {
+            $convert_coefficient= Settings::find()->where(['key' =>'convert_money_coefficient'])->one()->value;
+            $user_money->prize_id=Prize::TYPE_BONUS;
+            $user_money->status=UserPrize::STATUS_SENT;
+            $user_money->quantity=$user_money->quantity * $convert_coefficient;
+            $user_money->save();
+
+            Yii::$app->session->setFlash('success', "Your money was converted to Loyality Bonus");
+        }
+
+        return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
 
 
     }
