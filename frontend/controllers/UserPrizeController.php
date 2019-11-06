@@ -12,6 +12,7 @@ use yii\filters\VerbFilter;
 use yii\filters\AccessControl;
 use common\models\Prize;
 use common\models\UserPrize;
+use common\components\MoneySender;
 use common\models\Settings;
 use yii\behaviors\TimestampBehavior;
 
@@ -30,7 +31,7 @@ class UserPrizeController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['process', 'show-prize-success', 'show-prize-error'],
+                        'actions' => ['process', 'show-prize-success', 'show-prize-error', 'send-prize'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -61,7 +62,7 @@ class UserPrizeController extends Controller
         $model = new UserPrize();
 
         if (Yii::$app->request->post()){
-               $check_user_prize=UserPrize::findOne(Yii::$app->user->id);
+               $check_user_prize=UserPrize::find()->where(['user_id' => Yii::$app->user->id]);
 
                if (!$check_user_prize) {
 
@@ -130,6 +131,60 @@ class UserPrizeController extends Controller
         return $this->render('show-prize-error', [
 
         ]);
+
+    }
+
+    /*
+     * send prize to user
+     */
+    public function actionSendPrize($actionType)
+    {
+
+        $user_prize=UserPrize::find()->where(['user_id'=>Yii::$app->user->id])->one();
+
+        if (!$user_prize or $actionType !=$user_prize->prize->prize_type) {
+            return $this->redirect(['/site/index']);
+        }
+
+        switch ($actionType) {
+            case Prize::TYPE_MONEY:
+                $moneySender=new MoneySender();
+                try {
+                    $action = $moneySender->sendMoney($user_prize->quantity, 'user_account');
+                    $user_prize->status=UserPrize::STATUS_SENT;
+                } catch (\Exception $e) {
+                }
+                break;
+            case Prize::TYPE_BONUS:
+                $user_prize->status=UserPrize::STATUS_SENT;
+                $action=true;
+                break;
+            case Prize::TYPE_PRODUCT:
+                $user_prize->status=UserPrize::STATUS_PROCESSING;
+                $action=true;
+                break;
+            default:
+                $action=false;
+        }
+
+
+        if ($action) {
+            try {
+                $user_prize->save();
+            } catch (\Exception $e) {
+            }
+
+            Yii::$app->session->setFlash('success', "Your prize was successfully sent");
+
+        } else {
+            Yii::$app->session->setFlash('error', "Try again later");
+        }
+
+
+        return $this->render('prize-send', [
+
+        ]);
+
 
     }
 }

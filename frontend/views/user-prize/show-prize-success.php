@@ -1,6 +1,7 @@
 <?php
 
 use yii\helpers\Html;
+use yii\helpers\Url;
 use yii\widgets\DetailView;
 use common\models\UserPrize;
 
@@ -22,10 +23,19 @@ $this->params['breadcrumbs'][] = ['label' => 'User Prize', 'url' => ['index']];
     <br> <a class='btn btn-primary'> <?=UserPrize::readableTypes()[$model->status]?> </a> <br>  <br>
 
 
-    Actions:
-    <br> <a class='btn btn-primary'> <?=UserPrize::PrizesActions($model->prize->prize_type) ?> </a> <br>
+    <?php
+    if ($model->status==UserPrize::STATUS_RECEIVED) {
+
+     echo 'Actions:';
+
+    $typeAction = Url::toRoute(['user-prize/send-prize', 'actionType' => $model->prize->prize_type]);
+    ?>
+
+    <br> <a href="<?=$typeAction?>" class='btn btn-primary'> <?=UserPrize::PrizesActions($model->prize->prize_type) ?> </a> <br>
 
     <a class='btn btn-default'> refuse a prize </a>
+
+    <?php } ?>
 
 </div>
 
