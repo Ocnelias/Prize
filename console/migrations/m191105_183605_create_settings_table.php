@@ -14,12 +14,20 @@ class m191105_183605_create_settings_table extends Migration
     {
         $this->createTable('{{%settings}}', [
             'id' => $this->primaryKey(),
-            'convert_money_coefficient' => $this->float()->notNull()->defaultValue(1),
-            'money_range_from' => $this->integer()->notNull()->defaultValue(1),
-            'money_range_to' => $this->integer()->notNull()->defaultValue(1000),
-            'bonus_range_from' => $this->integer()->notNull()->defaultValue(1),
-            'bonus_range_to' => $this->integer()->notNull()->defaultValue(1000),
+            'key'=> $this->string(255)->notNull(),
+            'value'=> $this->string(255)->notNull(),
         ]);
+
+
+        Yii::$app->db->createCommand()->batchInsert('{{%settings}}', ['key', 'value'],
+            [
+                ['convert_money_coefficient', "1",],
+                ['money_range_from', "1"],
+                ['money_range_to', "1000"],
+                ['bonus_range_from', "1"],
+                ['bonus_range_to', "1000"],
+            ])->
+        execute();
     }
 
     /**

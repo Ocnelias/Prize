@@ -21,12 +21,31 @@ use Yii;
 class UserPrize extends \yii\db\ActiveRecord
 {
 
+    const STATUS_RECEIVED = 0;
+    const STATUS_PROCESSING= 1;
+    const STATUS_SENT= 2;
+    const STATUS_REFUSED= 3;
+    const STATUS_CHANGED= 4;
+
+
     /**
      * {@inheritdoc}
      */
     public static function tableName()
     {
         return 'user_prizes';
+    }
+
+    public static function readableTypes()
+    {
+        $list = [
+            self::STATUS_RECEIVED => 'Received',
+            self::STATUS_PROCESSING => 'Processing',
+            self::STATUS_SENT => 'Sent',
+            self::STATUS_REFUSED => 'Refused',
+            self::STATUS_CHANGED => 'Changed to bonus',
+        ];
+        return $list;
     }
 
     /**
@@ -73,4 +92,25 @@ class UserPrize extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::className(), ['id' => 'user_id']);
     }
+
+    public static function getQuantity($type)
+    {
+
+        switch ($type) {
+            case Prize::TYPE_MONEY:
+                $quantity=mt_rand(Settings::find()->where(['key' =>'money_range_from'])->one()->value, Settings::find()->where(['key' =>'money_range_to'])->one()->value);
+                break;
+            case Prize::TYPE_BONUS:
+                $quantity=mt_rand(Settings::find()->where(['key' =>'bonus_range_from'])->one()->value, Settings::find()->where(['key' =>'bonus_range_to'])->one()->value);
+                break;
+            case Prize::TYPE_PRODUCT:
+                $quantity=1;
+                break;
+            default:
+                $quantity=1;
+        }
+
+        return $quantity;
+    }
+
 }

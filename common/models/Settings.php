@@ -8,11 +8,8 @@ use Yii;
  * This is the model class for table "settings".
  *
  * @property int $id
- * @property double $convert_money_coefficient
- * @property int $money_range_from
- * @property int $money_range_to
- * @property int $bonus_range_from
- * @property int $bonus_range_to
+ * @property string $key
+ * @property string $value
  */
 class Settings extends \yii\db\ActiveRecord
 {
@@ -30,8 +27,8 @@ class Settings extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['convert_money_coefficient'], 'number'],
-            [['money_range_from', 'money_range_to', 'bonus_range_from', 'bonus_range_to'], 'integer'],
+            [['key', 'value'], 'required'],
+            [['key', 'value'], 'string', 'max' => 255],
         ];
     }
 
@@ -42,11 +39,8 @@ class Settings extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'convert_money_coefficient' => 'Convert Money Coefficient',
-            'money_range_from' => 'Money Range From',
-            'money_range_to' => 'Money Range To',
-            'bonus_range_from' => 'Bonus Range From',
-            'bonus_range_to' => 'Bonus Range To',
+            'key' => 'Key',
+            'value' => 'Value',
         ];
     }
 }
