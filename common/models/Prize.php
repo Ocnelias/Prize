@@ -16,6 +16,12 @@ use Yii;
  */
 class Prize extends \yii\db\ActiveRecord
 {
+
+    const TYPE_MONEY = 1;
+    const TYPE_BONUS = 2;
+    const TYPE_PRODUCT = 3;
+
+
     /**
      * {@inheritdoc}
      */
@@ -23,6 +29,17 @@ class Prize extends \yii\db\ActiveRecord
     {
         return 'prizes';
     }
+
+    public static function readableTypes()
+    {
+        $list = [
+            self::TYPE_MONEY => 'Money',
+            self::TYPE_BONUS => 'Bonus',
+            self::TYPE_PRODUCT => 'Stuff',
+        ];
+        return $list;
+    }
+
 
     /**
      * {@inheritdoc}

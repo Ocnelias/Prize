@@ -23,13 +23,14 @@ class m191105_182839_create_prizes_table extends Migration
         Yii::$app->db->createCommand()->batchInsert('{{%prizes}}', ['prize_name', 'prize_type', 'quantity'],
             [
                 ['money', 1, 1000],
-                ['bonus', 2, null],
+                ['bonus', 2, 1000000],
                 ['product_1', 3, 1],
                 ['product_2', 3, 10],
                 ['product_3', 3, 20],
                 ['product_4', 3, 30],
                 ['product_5', 3, 50],
-            ]);
+            ])->
+        execute();
     }
 
     /**

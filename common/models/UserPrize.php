@@ -20,6 +20,7 @@ use Yii;
  */
 class UserPrize extends \yii\db\ActiveRecord
 {
+
     /**
      * {@inheritdoc}
      */
