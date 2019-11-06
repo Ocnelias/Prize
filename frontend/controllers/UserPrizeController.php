@@ -31,7 +31,7 @@ class UserPrizeController extends Controller
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['process', 'show-prize-success', 'show-prize-error', 'send-prize'],
+                        'actions' => ['process', 'show-prize-success', 'show-prize-error', 'send-prize', 'refuse-prize'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -62,7 +62,7 @@ class UserPrizeController extends Controller
         $model = new UserPrize();
 
         if (Yii::$app->request->post()){
-               $check_user_prize=UserPrize::find()->where(['user_id' => Yii::$app->user->id]);
+               $check_user_prize=UserPrize::find()->where(['user_id' => Yii::$app->user->id])->one();
 
                if (!$check_user_prize) {
 
@@ -186,5 +186,13 @@ class UserPrizeController extends Controller
         ]);
 
 
+    }
+
+    /*
+    * refuse a prize
+    */
+    public function actionRefusePrize()
+    {
+      //TODO
     }
 }
