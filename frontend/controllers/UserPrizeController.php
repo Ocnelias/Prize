@@ -196,10 +196,9 @@ class UserPrizeController extends Controller
             ->one();
 
         if ($user_money) {
-            $convert_coefficient= Settings::find()->where(['key' =>'convert_money_coefficient'])->one()->value;
             $user_money->prize_id=Prize::TYPE_BONUS;
             $user_money->status=UserPrize::STATUS_SENT;
-            $user_money->quantity=$user_money->quantity * $convert_coefficient;
+            $user_money->quantity=UserPrize::convertToBonus($user_money->quantity);
             $user_money->save();
 
             Yii::$app->session->setFlash('success', "Your money was converted to Loyality Bonus");

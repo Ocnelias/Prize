@@ -2,6 +2,7 @@
 
 namespace common\models;
 
+use app\models\Setting;
 use Yii;
 
 /**
@@ -146,6 +147,13 @@ class UserPrize extends \yii\db\ActiveRecord
         }
 
         return $action;
+    }
+
+    public static function convertToBonus($money)
+    {
+        $convert_coefficient= Settings::find()->where(['key' =>'convert_money_coefficient'])->one()->value;
+
+        return $money * $convert_coefficient;
     }
 
 }
