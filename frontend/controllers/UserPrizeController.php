@@ -76,9 +76,17 @@ class UserPrizeController extends Controller
                        $model->quantity = UserPrize::getQuantity($available_prizes->prize_type);
                        $model->created_at = time();
                        $model->updated_at = time();
-                       $model->save();
-                       Yii::$app->session->setFlash('success', "Your have won the prize!");
-                       return $this->redirect(['show-prize-success', 'id' => $model->id]);
+
+                          if($model->save() ) {
+
+                              $prizes_quantity = Prize::findOne($prize_id);
+                              $prizes_quantity->quantity=$prizes_quantity->quantity-$model->quantity;
+                              $prizes_quantity->save();
+
+                              Yii::$app->session->setFlash('success', "Your have won the prize!");
+                              return $this->redirect(['show-prize-success', 'id' => $model->id]);
+                          }
+
                    }
                    $error_message='There no available prizes for now';
                }
